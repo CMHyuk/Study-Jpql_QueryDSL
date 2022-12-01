@@ -1,5 +1,6 @@
 package com.example.studyjpqlandqurydsl;
 
+import com.querydsl.core.Tuple;
 import com.querydsl.jpa.impl.JPAQueryFactory;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
@@ -135,5 +136,26 @@ public class JpqlAndQueryDslTest {
         assertThat(findMembers.get(0).getAge()).isSameAs(20);
         assertThat(findMembers.get(1).getName()).isEqualTo("member2");
         assertThat(findMembers.get(1).getAge()).isSameAs(20);
+    }
+
+    @Test
+    void aggregationDsl() {
+        List<Tuple> result = queryFactory
+                .select(
+                        member.count(),
+                        member.age.max(),
+                        member.age.min(),
+                        member.age.sum(),
+                        member.age.avg()
+                )
+                .from(member)
+                .fetch();
+
+        Tuple tuple = result.get(0);
+        assertThat(tuple.get(member.count())).isEqualTo(3);
+        assertThat(tuple.get(member.age.max())).isEqualTo(20);
+        assertThat(tuple.get(member.age.min())).isEqualTo(10);
+        assertThat(tuple.get(member.age.sum())).isEqualTo(50);
+        assertThat(tuple.get(member.age.avg())).isEqualTo(16.666666666666668);
     }
 }
