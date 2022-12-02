@@ -158,4 +158,18 @@ public class JpqlAndQueryDslTest {
         assertThat(tuple.get(member.age.sum())).isEqualTo(50);
         assertThat(tuple.get(member.age.avg())).isEqualTo(16.666666666666668);
     }
+
+    @Test
+    void groupDsl() {
+        List<Tuple> result = queryFactory
+                .select(team.teamName, member.age.avg())
+                .from(member)
+                .join(member.team, team)
+                .groupBy(team.teamName)
+                .fetch();
+
+        Tuple team1 = result.get(0);
+        assertThat(team1.get(team.teamName)).isEqualTo("team1");
+        assertThat(team1.get(member.age.avg())).isEqualTo(15);
+    }
 }
